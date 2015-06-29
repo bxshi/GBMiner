@@ -38,7 +38,7 @@ void worker(local::stream_protocol::socket *socket, graph<std::string, std::stri
   try {
     if (commands.size() == 0) {
       return_string = "No command provided\n";
-    } else if (commands.at(0) == "path") {
+    } else if (commands.at(0).compare("path") == 0) {
       std::ostringstream oss;
       std::vector<std::vector<unsigned int> > paths = g.homogeneous_dfs((unsigned int) stoi(commands.at(1)),
                                                                         (unsigned int) stoi(commands.at(2)),
@@ -68,7 +68,7 @@ void worker(local::stream_protocol::socket *socket, graph<std::string, std::stri
       }
       return_string = oss.str();
 
-    } else if (commands.at(0) == "hpath") {
+    } else if (commands.at(0).compare("hpath") == 0) {
       std::ostringstream oss;
       std::pair<std::vector<std::vector<std::pair<unsigned int, unsigned int> > >, std::vector<std::vector<bool> > > hpaths = g.heterogeneous_dfs(
           (unsigned int) stoi(commands.at(1)),
@@ -117,7 +117,7 @@ void worker(local::stream_protocol::socket *socket, graph<std::string, std::stri
 
     } else if (commands.at(0) == "in_neighbor") {
       std::ostringstream oss;
-      std::vector<unsigned int> neighbors = g.get_in_edges((unsigned int) stoi(commands.at(1)));
+      const std::set<unsigned int> &neighbors = g.get_in_edges((unsigned int) stoi(commands.at(1)));
       for (auto it = neighbors.cbegin(); it != neighbors.cend(); ++it) {
         oss << *it << ",";
       }
@@ -125,17 +125,39 @@ void worker(local::stream_protocol::socket *socket, graph<std::string, std::stri
       return_string = oss.str();
     } else if (commands.at(0) == "out_neighbor") {
       std::ostringstream oss;
-      std::vector<unsigned int> neighbors = g.get_out_edges((unsigned int) stoi(commands.at(1)));
+      const std::set<unsigned int> &neighbors = g.get_out_edges((unsigned int) stoi(commands.at(1)));
       for (auto it = neighbors.cbegin(); it != neighbors.cend(); ++it) {
         oss << *it << ",";
       }
       oss << "\n";
       return_string = oss.str();
+    } else if (commands.at(0) == "aa") {
+      return_string = std::to_string(
+          g.adamic_adar((unsigned int) stoi(commands.at(1)), (unsigned int) stoi(commands.at(2))));
+    } else if (commands.at(0) == "sp") {
+      return_string = std::to_string(
+          g.semantic_proximity((unsigned int) stoi(commands.at(1)), (unsigned int) stoi(commands.at(2))));
+    } else if (commands.at(0) == "maa") {
+      return_string = std::to_string(
+          g.multidimensional_adamic_adar((unsigned int) stoi(commands.at(1)), (unsigned int) stoi(commands.at(2)),
+                                         (unsigned int) stoi(commands.at(3))));
+
+    } else if (commands.at(0) == "ppr") {
+      return_string = std::to_string(
+          g.personalize_pagerank((unsigned int) stoi(commands.at(1)), (unsigned int) stoi(commands.at(2)),
+                                 0.15, 0.00001, 20, false));
+    } else if (commands.at(0) == "pa") {
+      return_string = std::to_string(g.preferential_attachment((unsigned int) stoi(commands.at(1)),
+                                                               (unsigned int) stoi(commands.at(2))));
+    } else if (commands.at(0) == "katz") {
+      return_string = std::to_string(
+          g.katz((unsigned int) stoi(commands.at(1)),
+                 (unsigned int) stoi(commands.at(2))));
     } else {
       return_string = "Unsupported command\n";
     }
   } catch (std::exception error) {
-    std::cerr << error.what() << std::endl;
+    std::cerr << "Error occurred when executing command " << buf.elems << ". Error is " << error.what() << std::endl;
     return_string = error.what();
   }
 
