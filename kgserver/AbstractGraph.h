@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-#include <Logger.h>
 #include "GraphProperty.h"
 
 namespace KGMiner {
@@ -20,6 +19,8 @@ namespace KGMiner {
   class AbstractGraph {
 
   public:
+
+      virtual const GraphProperty& getProperties() = 0;
 
       /*! Insert an vertex into graph
        *

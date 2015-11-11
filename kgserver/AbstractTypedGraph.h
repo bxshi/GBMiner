@@ -7,6 +7,8 @@
 
 #include <vector>
 
+#include "GraphProperty.h"
+
 namespace KGMiner {
   using namespace std;
 
@@ -14,7 +16,10 @@ namespace KGMiner {
   class AbstractTypedGraph {
   public:
 
-      virtual inline bool vertexExists(unsigned int id) = 0;
+      virtual const GraphProperty& getProperties() = 0;
+
+
+      virtual bool vertexExists(unsigned int id) = 0;
 
       /*! \brief Insert an vertex with its data
        *
