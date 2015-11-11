@@ -3,7 +3,9 @@ project(KGServer)
 
 add_definitions(-std=c++11)
 
-include_directories(/usr/local/include /usr/include)
-link_directories(/usr/local/include /usr/include)
+include_directories(/usr/local/include /usr/include ../include)
+link_directories(/usr/local/lib /usr/lib)
 
-add_executable(kgserver main.cpp)
+set(SOURCE_FILES GraphProperty.cpp GraphProperty.h AbstractGraph.h AbstractGraph.cpp)
+
+add_executable(kgserver main.cpp ${SOURCE_FILES})
