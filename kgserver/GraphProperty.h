@@ -11,9 +11,12 @@
 namespace KGMiner {
   using namespace std;
 
+  /*! Graph Types in KGMiner */
   enum GraphType {
-      GRAPH_DIRECTED    = 0x01,
-      GRAPH_UNDIRECTED  = 0x02
+      GRAPH_DIRECTED,
+      GRAPH_UNDIRECTED,
+      GRAPH_TYPED_DIRECTED,
+      GRAPH_TYPED_UNDIRECTED
   };
 
   class GraphProperty {
