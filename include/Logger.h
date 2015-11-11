@@ -37,7 +37,7 @@ namespace KGMiner {
        *
        * \param strLevel string of log level, can be "trace", "debug", "info", "warn", "error", and "fatal"
        */
-      LOG_LEVEL getLevel(string strLevel) {
+      inline LOG_LEVEL getLevel(string strLevel) const {
 
         transform(strLevel.begin(), strLevel.end(), strLevel.begin(), ::tolower);
 
@@ -57,6 +57,8 @@ namespace KGMiner {
 
       }
 
+      string prefix;
+
   public:
 
       Logger() : level(LOG_LEVEL_TRACE) {
@@ -71,15 +73,23 @@ namespace KGMiner {
         level = getLevel(strLevel);
       }
 
-      void log(string strLevel, string str) {
+      inline void setPrefix(string str) {
+        prefix = str;
+      }
+
+      inline string getPrefix() const {
+        return prefix;
+      }
+
+      inline void log(string strLevel, string str) const {
         log(getLevel(strLevel), str);
       }
 
-      void log(string str) {
+      inline void log(string str) const {
         log(level, str);
       }
 
-      void log(LOG_LEVEL logLevel, string str) {
+      inline void log(LOG_LEVEL logLevel, string str) const {
         switch (logLevel) {
           case LOG_LEVEL_TRACE:
             trace(str);
@@ -104,31 +114,43 @@ namespace KGMiner {
         }
       }
 
-      void trace(string str) {
-        BOOST_LOG_TRIVIAL(trace) << str;
+      inline void trace(string str) const {
+        ostringstream oss;
+        oss << getPrefix() << str;
+        BOOST_LOG_TRIVIAL(trace) << oss.str();
       }
 
-      void debug(string str) {
-        BOOST_LOG_TRIVIAL(debug) << str;
+      inline void debug(string str) const {
+        ostringstream oss;
+        oss << getPrefix() << str;
+        BOOST_LOG_TRIVIAL(debug) << oss.str();
       }
 
-      void info(string str) {
-        BOOST_LOG_TRIVIAL(info) << str;
+      inline void info(string str) const {
+        ostringstream oss;
+        oss << getPrefix() << str;
+        BOOST_LOG_TRIVIAL(info) << oss.str();
       }
 
-      void warn(string str) {
-        BOOST_LOG_TRIVIAL(warning) << str;
+      inline void warn(string str) const {
+        ostringstream oss;
+        oss << getPrefix() << str;
+        BOOST_LOG_TRIVIAL(warning) << oss.str();
       }
 
-      void error(string str) {
-        BOOST_LOG_TRIVIAL(error) << str;
+      inline void error(string str) const {
+        ostringstream oss;
+        oss << getPrefix() << str;
+        BOOST_LOG_TRIVIAL(error) << oss.str();
       }
 
-      void fatal(string str) {
-        BOOST_LOG_TRIVIAL(fatal) << str;
+      inline void fatal(string str) const {
+        ostringstream oss;
+        oss << getPrefix() << str;
+        BOOST_LOG_TRIVIAL(fatal) << oss.str();
       }
 
-      string getDefaultLevel() {
+      inline string getDefaultLevel() const {
         switch(level) {
           case LOG_LEVEL_TRACE:
             return "trace";
