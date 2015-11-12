@@ -11,7 +11,7 @@
 namespace KGMiner {
   using namespace std;
 
-  class MetaPath : AbstractPath {
+  class Path : AbstractPath {
   private:
       vector<unsigned int> vertices;
       vector<long> edges;
@@ -20,7 +20,7 @@ namespace KGMiner {
 
   public:
 
-      MetaPath(unsigned int src);
+      Path(unsigned int src);
 
       unsigned int length() const;
 
@@ -29,6 +29,8 @@ namespace KGMiner {
       bool append(unsigned int edge, bool reversed, unsigned int vertex);
 
       inline bool exists(unsigned int vertex) const;
+
+      unsigned int last() const;
 
       string str() const;
 

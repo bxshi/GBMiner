@@ -43,11 +43,11 @@ namespace KGMiner{
     // linking to invalid vertices
     if (!insert) {
       if (!vertexExists(src)) {
-        logger.debug("vertex "+to_string(src)+" already exists");
+        logger.debug("vertex "+to_string(src)+" does not exist");
         return false;
       }
       if (!vertexExists(dst)) {
-        logger.debug("vertex "+to_string(dst)+" already exists");
+        logger.debug("vertex "+to_string(dst)+" does not exist");
         return false;
       }
     }
@@ -121,7 +121,7 @@ namespace KGMiner{
 
     bool res = true;
     for(auto i = 0; i < data.size(); ++i) {
-      if (insertEdge(srcVec[i], VD(), dstVec[i], ED(), data[i], false)) res = false;
+      if (!insertEdge(srcVec[i], VD(), dstVec[i], ED(), data[i], false)) res = false;
     }
 
     return res;
@@ -146,9 +146,154 @@ namespace KGMiner{
     return oss.str();
   }
 
+
+  template<class VD, class ED>
+  vector<deque<unsigned int>> TypedDirectedGraph<VD, ED>::cartesianProduct(
+      const vector<deque<unsigned int>> &lhs, const vector<deque<unsigned int>> &rhs) const {
+
+    vector<deque<unsigned int>> vertexPaths;
+
+    for(auto lpath : lhs) {
+      for(auto rpath : rhs) {
+        vertexPaths.push_back(lpath);
+        for(auto rvertex : rpath) {
+          vertexPaths.back().push_back(rvertex);
+        }
+      }
+    }
+
+    return vertexPaths;
+  }
+
+  template<class VD, class ED>
+  vector<Path> TypedDirectedGraph<VD, ED>::getPathsBetween(unsigned int src, unsigned int dst, unsigned int maxLength,
+                                                           const unordered_set<unsigned int> &vertexMask,
+                                                           const unordered_set<ED> &edgeMask) {
+    vector<Path> pathVec;
+
+    // we assume that there is no self-loop
+    if (src == dst) return pathVec;
+
+    if (vertexMask.find(src) != vertexMask.end() || vertexMask.find(dst) != vertexMask.end()) {
+      return pathVec; // src and dst are masked
+    }
+
+
+    vector<unsigned int> vertexPath = {src};
+
+    function<void()> helper = [&]() {
+
+      if (vertexPath.size() > maxLength + 1) return;
+
+      if (vertexPath.back() == dst) {
+        auto expandedPaths = expandVertexPath(vertexPath, edgeMask);
+        pathVec.insert(pathVec.end(), expandedPaths.begin(), expandedPaths.end());
+        return;
+      }
+
+      auto neighbors = directedGraph.find(vertexPath.back());
+
+      // visited set for current level
+      unordered_set<unsigned int> visitedSet;
+
+      visitedSet.insert(vertexPath.begin(), vertexPath.end());
+
+      if (neighbors != directedGraph.end()) {
+        for(auto neighbor : neighbors->second) {
+          // not masked
+          if (vertexMask.find(neighbor.first) == vertexMask.end() && visitedSet.find(neighbor.first) == visitedSet.end()) {
+            vertexPath.push_back(neighbor.first);
+            helper();
+            vertexPath.pop_back();
+            visitedSet.insert(neighbor.first);
+          }
+        }
+      }
+
+      neighbors = reversedGraph.find(vertexPath.back());
+
+      if (neighbors != reversedGraph.end()) {
+        for(auto neighbor : neighbors->second) {
+          if (vertexMask.find(neighbor.first) == vertexMask.end() &&
+              visitedSet.find(neighbor.first) == visitedSet.end()) {
+            vertexPath.push_back(neighbor.first);
+            helper();
+            vertexPath.pop_back();
+            visitedSet.insert(neighbor.first);
+          }
+        }
+      }
+
+    };
+
+    helper();
+
+    return pathVec;
+  }
+
+  template<class VD, class ED>
+  vector <Path> TypedDirectedGraph<VD, ED>::expandVertexPath(const vector<unsigned int> &vertexPath,
+                                                               const unordered_set <ED> &edgeMask) const {
+
+    deque<Path> paths;
+    for(auto vertex : vertexPath) {
+      if (paths.size() == 0) {
+        paths.push_back(Path(vertex));
+      } else {
+        // still have old paths
+        while(paths.size() > 0 && paths.front().last() != vertex) {
+          Path p = paths.front();
+          paths.pop_front();
+
+          auto neighbors = directedGraph.find(vertex);
+          auto rneighbors = reversedGraph.find(vertex);
+
+          if (neighbors != directedGraph.end() &&
+              neighbors->second.find(p.last()) != neighbors->second.end()) {
+            for(auto edge : neighbors->second.at(p.last())) { // p.last() <-(edge)- vertex
+              if (edgeMask.find(eData[edge]) == edgeMask.end()) { // only log unmasked link
+                paths.push_back(p);
+                paths.back().append(edge, true, vertex);
+              }
+            }
+          }
+
+          if (rneighbors != reversedGraph.end() &&
+              rneighbors->second.find(p.last()) != rneighbors->second.end()) {
+            for(auto edge : rneighbors->second.at(p.last())) { // p.last() -(edge)-> vertex
+              if (edgeMask.find(eData[edge]) == edgeMask.end()) { // only log unmasked link
+                paths.push_back(p);
+                paths.back().append(edge, false, vertex);
+              }
+            }
+          }
+
+        }
+
+        if (paths.size() == 0) return vector<Path>(); // the path breaks at certain point that there are no valid edges
+
+      }
+    }
+
+    return vector<Path>(paths.begin(), paths.end());
+  }
+
+  template<class VD, class ED>
+  vector <Path> TypedDirectedGraph<VD, ED>::expandVertexPaths(const vector <vector<unsigned int>> &vertexPaths,
+                                                                    const unordered_set <ED> &edgeMask) const {
+
+    vector<Path> paths;
+
+    // TODO: optimize this part by eliminating deep copy
+    for (auto vertexPath : vertexPaths) {
+      auto tmpPaths = expandVertexPath(vertexPath, edgeMask);
+      paths.insert(paths.end(), tmpPaths.begin(), tmpPaths.end());
+    }
+
+    return paths;
+  }
+
   /* instantations decleared here */
   template class TypedDirectedGraph<int, int>;
-  template class TypedDirectedGraph<string, string>;
-
 }
 

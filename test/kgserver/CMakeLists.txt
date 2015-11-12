@@ -13,7 +13,7 @@ link_directories(/usr/local/lib /usr/lib)
 
 set(SOURCE_FILES GraphPropertyTest.cpp ../../kgserver/GraphProperty.h ../../kgserver/GraphProperty.cpp
         TypedDirectedGraphTest.cpp ../../kgserver/TypedDirectedGraph.h ../../kgserver/TypedDirectedGraph.cpp ../../kgserver/AbstractTypedGraph.h
-        ../../kgserver/AbstractGraph.h ../../kgserver/AbstractPath.h ../../kgserver/MetaPath.cpp ../../kgserver/MetaPath.h MetaPathTest.cpp)
+        ../../kgserver/AbstractGraph.h ../../kgserver/AbstractPath.h ../../kgserver/Path.cpp ../../kgserver/Path.h PathTest.cpp)
 
 add_executable(kgserver_test basic_test.cpp ${SOURCE_FILES} main.cpp)
 

@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <TypedDirectedGraph.h>
+#include <Path.h>
 
 TEST(TypedDirectedGraphTest, construction) {
   using namespace KGMiner;
@@ -96,4 +97,50 @@ TEST(TypedDirectedGraphTest, insertEdges) {
   EXPECT_EQ(graph.getProperties().getVertices(), 2);
   EXPECT_EQ(graph.getProperties().getEdges(), 4); // 1-1-1 and 2-2-2 are inserted
 
+}
+
+TEST(TypedDirectedGraphTest, pathsBetweenTwoNodes) {
+  using namespace KGMiner;
+  TypedDirectedGraph<int, int> graph;
+
+  vector<unsigned int> vids = {1,2,3,4,5,6};
+  vector<int> vdata = {1,2,3,4,5,6};
+
+  EXPECT_EQ(graph.insertVertices(vids, vdata), true);
+  EXPECT_EQ(graph.getProperties().getVertices(), 6);
+
+  vector<unsigned int> srcs = {1,1,1,1,1,2,4,2,2,4,5};
+  vector<unsigned int> dsts = {2,2,3,3,3,4,2,5,6,6,6};
+  vector<int> edata = {1,1,1,2,1,2,2,1,1,1,1};
+
+  EXPECT_EQ(graph.insertEdges(srcs, dsts, edata), true);
+  EXPECT_EQ(graph.getProperties().getEdges(), 11);
+
+  unordered_set<unsigned int> vertexMask;
+  unordered_set<int> edgeMask;
+
+  //self link
+  EXPECT_EQ(graph.getPathsBetween(1,1,3, vertexMask, edgeMask).size(), 0);
+
+  //unexist node
+  EXPECT_EQ(graph.getPathsBetween(1,99,3,vertexMask,edgeMask).size(), 0);
+
+  vector<Path> paths = graph.getPathsBetween(1,6,3, vertexMask, edgeMask);
+  EXPECT_EQ(paths.size(), 8);
+
+  edgeMask.insert(2);
+  paths = graph.getPathsBetween(1,6,3, vertexMask, edgeMask);
+  EXPECT_EQ(paths.size(), 4);
+
+  vertexMask.insert(4);
+  paths = graph.getPathsBetween(1,6,3, vertexMask, edgeMask);
+  EXPECT_EQ(paths.size(), 4);
+
+  vertexMask.insert(5);
+  paths = graph.getPathsBetween(1,6,3, vertexMask, edgeMask);
+  EXPECT_EQ(paths.size(), 2);
+
+  edgeMask.insert(1);
+  paths = graph.getPathsBetween(1,6,3, vertexMask, edgeMask);
+  EXPECT_EQ(paths.size(), 0);
 }

@@ -4,12 +4,12 @@
 
 #include <gtest/gtest.h>
 
-#include <MetaPath.h>
+#include "Path.h"
 
 TEST(MetaPath, append) {
   using namespace KGMiner;
 
-  MetaPath metaPath(12u);
+  Path metaPath(12u);
 
   EXPECT_EQ(metaPath.length(), 0);
 
@@ -22,7 +22,7 @@ TEST(MetaPath, append) {
 TEST(MetaPath, exists) {
   using namespace KGMiner;
 
-  MetaPath metaPath(3u);
+  Path metaPath(3u);
 
   EXPECT_EQ(metaPath.append(1,1), true);
 
@@ -33,7 +33,7 @@ TEST(MetaPath, exists) {
 TEST(MetaPath, str) {
   using namespace KGMiner;
 
-  MetaPath metaPath(9u);
+  Path metaPath(9u);
 
   EXPECT_EQ(metaPath.append(1, 1), true);
   EXPECT_EQ(metaPath.append(1, true, 2), true);

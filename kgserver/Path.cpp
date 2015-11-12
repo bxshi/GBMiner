@@ -4,21 +4,21 @@
 
 #include <sstream>
 
-#include "MetaPath.h"
+#include "Path.h"
 
 namespace KGMiner{
   using namespace std;
 
-  bool MetaPath::isValid() const {
+  bool Path::isValid() const {
     return (vertices.size() == 0 && edges.size() == vertices.size()) ||
            vertices.size() - 1 == edges.size();
   }
 
-  bool MetaPath::append(unsigned int edge, unsigned int vertex) {
+  bool Path::append(unsigned int edge, unsigned int vertex) {
     return append(edge, false, vertex);
   }
 
-  bool MetaPath::append(unsigned int edge, bool reversed, unsigned int vertex) {
+  bool Path::append(unsigned int edge, bool reversed, unsigned int vertex) {
     if (exists(vertex)) return false;
 
     vertices.push_back(vertex);
@@ -28,18 +28,18 @@ namespace KGMiner{
 
   }
 
-  inline bool MetaPath::exists(unsigned int vertex) const {
+  inline bool Path::exists(unsigned int vertex) const {
     for(auto v : vertices) {
       if (v == vertex) return true;
     }
     return false;
   }
 
-  unsigned int MetaPath::length() const {
+  unsigned int Path::length() const {
     return (unsigned int)edges.size();
   }
 
-  string MetaPath::str() const {
+  string Path::str() const {
     ostringstream oss;
     if (!isValid()) return oss.str();
 
@@ -60,7 +60,11 @@ namespace KGMiner{
     return oss.str();
   }
 
-  MetaPath::MetaPath(unsigned int src) {
+  Path::Path(unsigned int src) {
     vertices.push_back(src);
+  }
+
+  unsigned int Path::last() const {
+    return vertices.back();
   }
 }
