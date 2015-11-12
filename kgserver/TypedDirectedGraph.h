@@ -70,6 +70,8 @@ namespace KGMiner {
                        vector<ED> data);
 
       string str();
+
+
   };
 }
 

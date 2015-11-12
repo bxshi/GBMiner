@@ -11,7 +11,7 @@ link_directories(/usr/local/lib /usr/lib)
 set(SOURCE_FILES GraphProperty.cpp GraphProperty.h
         AbstractGraph.h
         AbstractTypedGraph.h
-        TypedDirectedGraph.h TypedDirectedGraph.cpp)
+        TypedDirectedGraph.h TypedDirectedGraph.cpp AbstractPath.h MetaPath.cpp MetaPath.h)
 
 add_executable(kgserver main.cpp ${SOURCE_FILES})
 target_link_libraries(kgserver
