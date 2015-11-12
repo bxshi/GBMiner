@@ -18,7 +18,7 @@ namespace KGMiner{
     directedGraph.reserve(approxVertices);
     directedGraph.reserve(approxVertices);
 
-    logger.setPrefix("\t[TypedDirectedGraph]\t");
+    logger.setPrefix("[TypedDirectedGraph]\t");
   }
 
   template<class VD, class ED>
@@ -58,20 +58,30 @@ namespace KGMiner{
 
     // TODO: we assume that all insert edges do not have duplications, or the duplication are intended
 
-    unsigned int eid = (unsigned int) edgeLists.size();
-    edgeLists.push_back(edge(src, dst, eid));
+    unsigned int eid = (unsigned int)graphProperty.getEdges();
+    if (eData.size() <= eid) eData.resize(eid + 1);
+
+    eData[eid] = data;
 
     if (directedGraph.find(src) == directedGraph.end()) {
-      directedGraph[src] = vector<unsigned int>();
+      directedGraph[src] = unordered_map<unsigned int, vector<unsigned int>>();
     }
 
-    directedGraph[src].push_back(eid); // insert this edge
+    if (directedGraph[src].find(dst) == directedGraph[src].end()) {
+      directedGraph[src][dst] = vector<unsigned int>();
+    }
+
+    directedGraph[src][dst].push_back(eid); // insert this edge
 
     if (reversedGraph.find(dst) == reversedGraph.end()) {
-      reversedGraph[dst] = vector<unsigned int>();
+      reversedGraph[dst] = unordered_map<unsigned int, vector<unsigned int>>();
     }
 
-    reversedGraph[dst].push_back(eid);
+    if (reversedGraph[dst].find(src) == reversedGraph[dst].end()) {
+      reversedGraph[dst][src] = vector<unsigned int>();
+    }
+
+    reversedGraph[dst][src].push_back(eid);
 
     graphProperty.setEdges(eid + 1); // eid starts at 0
 
@@ -101,27 +111,21 @@ namespace KGMiner{
     return res;
   }
 
-  // TODO: implement this
   template<class VD, class ED>
   bool TypedDirectedGraph<VD, ED>::insertEdges(vector<unsigned int> srcVec,
-                                               vector<unsigned int> dstVec,
-                                               vector<ED> data,
-                                               bool insert) {
-    return false;
-  }
+                                       vector<unsigned int> dstVec,
+                                       vector<ED> data) {
+    if (!(srcVec.size() == dstVec.size() && srcVec.size() == data.size())) {
+      return false;
+    }
 
-  // TODO: implement this
-  template<class VD, class ED>
-  bool TypedDirectedGraph<VD, ED>::insertEdges(vector<vector<unsigned int>> edgeVec,
-                                               vector<ED> data, bool insert) {
-    return false;
-  }
+    bool res = true;
+    for(auto i = 0; i < data.size(); ++i) {
+      if (insertEdge(srcVec[i], VD(), dstVec[i], ED(), data[i], false)) res = false;
+    }
 
-  // TODO: implement this
-  template<class VD, class ED>
-  bool TypedDirectedGraph<VD, ED>::insertEdges(vector<pair<unsigned int, unsigned int>> edgeVec,
-                                               vector<ED> data, bool insert) {
-    return false;
+    return res;
+
   }
 
   template<class VD, class ED>
@@ -129,8 +133,22 @@ namespace KGMiner{
     return graphProperty;
   }
 
+  template<class VD, class ED>
+  string TypedDirectedGraph<VD, ED>::str() {
+    ostringstream oss;
+    for(auto src : directedGraph) {
+      for(auto dst : src.second) {
+        for(auto eid : dst.second) {
+          oss << src.first << "-(" << eData[eid] << ")->" << dst.first << "\n";
+        }
+      }
+    }
+    return oss.str();
+  }
+
   /* instantations decleared here */
   template class TypedDirectedGraph<int, int>;
   template class TypedDirectedGraph<string, string>;
+
 }
 

@@ -6,6 +6,7 @@
 #define KGMINER_DIRECTEDAUGMENTEDGRAPH_H
 
 #include <unordered_map>
+#include <unordered_set>
 
 #include "AbstractTypedGraph.h"
 #include "GraphProperty.h"
@@ -30,15 +31,16 @@ namespace KGMiner {
 
       GraphProperty graphProperty;
 
+      unordered_set<VD> vtypes; /*< set of unique vertex types */
+      unordered_set<ED> etypes; /*< set of unique edge types */
+
       unordered_map<unsigned int, VD> vData; /*< vertex data indexed by id */
-      unordered_map<unsigned int, ED> eData; /*< edge data indexed by edge id */
+      vector<ED> eData; /*< edge data indexed by edge id */
 
-      vector<edge> edgeLists; /*< edge list */
-
-      /*! the original graph, keys are vertex id and values are edge ids (index in eData) */
-      unordered_map<unsigned int, vector<unsigned int> > directedGraph;
+      /*! the original graph, keys are src and values are dicts with dst as key and edge ids (index in eData) as values */
+      unordered_map<unsigned int, unordered_map<unsigned int, vector<unsigned int>>> directedGraph;
       /*! the graph with reversed edges, keys are vertex id and values are edge ids (index in eData) */
-      unordered_map<unsigned int, vector<unsigned int> > reversedGraph;
+      unordered_map<unsigned int, unordered_map<unsigned int, vector<unsigned int>>> reversedGraph;
 
   public:
       TypedDirectedGraph();
@@ -65,14 +67,9 @@ namespace KGMiner {
 
       bool insertEdges(vector<unsigned int> srcVec,
                        vector<unsigned int> dstVec,
-                       vector<ED> data,
-                       bool insert = false);
+                       vector<ED> data);
 
-      bool insertEdges(vector<vector<unsigned int>> edgeVec,
-                       vector<ED> data, bool insert = false);
-
-      bool insertEdges(vector<pair<unsigned int, unsigned int>> edgeVec,
-                       vector<ED> data, bool insert = false);
+      string str();
   };
 }
 

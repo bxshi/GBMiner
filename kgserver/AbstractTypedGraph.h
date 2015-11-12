@@ -71,21 +71,7 @@ namespace KGMiner {
        */
       virtual bool insertEdges(vector<unsigned int> srcVec,
                                vector<unsigned int> dstVec,
-                               vector<ED> data,
-                               bool insert = false) = 0;
-
-      /*!
-       *
-       */
-      virtual bool insertEdges(vector<vector<unsigned int>> edgeVec,
-                               vector<ED> data, bool insert = false) = 0;
-
-      /*!
-       *
-       */
-      virtual bool insertEdges(vector<pair<unsigned int, unsigned int>> edgeVec,
-                               vector<ED> data, bool insert = false) = 0;
-
+                               vector<ED> data) = 0;
   };
 }
 
