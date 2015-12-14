@@ -312,5 +312,8 @@ namespace KGMiner{
   /* instantations decleared here */
   template class TypedDirectedGraph<int, int>;
 
+  template
+  class TypedDirectedGraph<string, string>;
+
 }
 
