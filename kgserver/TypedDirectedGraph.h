@@ -14,6 +14,7 @@
 #include "GraphProperty.h"
 #include "Path.h"
 #include <Logger.h>
+#include <rapidjson.h>
 
 namespace KGMiner {
   using namespace std;
