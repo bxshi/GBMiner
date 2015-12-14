@@ -8,7 +8,7 @@ endif (APPLE)
 
 find_package(Boost COMPONENTS log log_setup thread filesystem system)
 
-include_directories(/usr/local/include /usr/include ../../kgserver ../../include)
+include_directories(/usr/local/include /usr/include ../../kgserver ../../include ../../include/rapidjson)
 link_directories(/usr/local/lib /usr/lib)
 
 set(SOURCE_FILES GraphPropertyTest.cpp ../../kgserver/GraphProperty.h ../../kgserver/GraphProperty.cpp

@@ -36,25 +36,15 @@ namespace KGMiner{
   }
 
   template<class VD, class ED>
-  bool TypedDirectedGraph<VD, ED>::insertEdge(unsigned int src, VD srcData,
-                                              unsigned int dst, VD dstData,
-                                              ED data, bool insert) {
-
-    // linking to invalid vertices
-    if (!insert) {
-      if (!vertexExists(src)) {
-        logger.debug("vertex "+to_string(src)+" does not exist");
-        return false;
-      }
-      if (!vertexExists(dst)) {
-        logger.debug("vertex "+to_string(dst)+" does not exist");
-        return false;
-      }
+  bool TypedDirectedGraph<VD, ED>::insertEdge(unsigned int src, unsigned int dst, ED data) {
+    if (!vertexExists(src)) {
+      logger.debug("vertex "+to_string(src)+" does not exist");
+      return false;
     }
-
-    // insert vertices if they are not in the graph
-    insertVertex(src, srcData);
-    insertVertex(dst, dstData);
+    if (!vertexExists(dst)) {
+      logger.debug("vertex "+to_string(dst)+" does not exist");
+      return false;
+    }
 
     // TODO: we assume that all insert edges do not have duplications, or the duplication are intended
 
@@ -86,6 +76,32 @@ namespace KGMiner{
     graphProperty.setEdges(eid + 1); // eid starts at 0
 
     //TODO: count edge types
+
+    return true;
+  }
+
+  template<class VD, class ED>
+  bool TypedDirectedGraph<VD, ED>::insertEdge(unsigned int src, VD srcData,
+                                              unsigned int dst, VD dstData,
+                                              ED data, bool insert) {
+
+    // linking to invalid vertices
+    if (!insert) {
+      if (!vertexExists(src)) {
+        logger.debug("vertex "+to_string(src)+" does not exist");
+        return false;
+      }
+      if (!vertexExists(dst)) {
+        logger.debug("vertex "+to_string(dst)+" does not exist");
+        return false;
+      }
+    }
+
+    // insert vertices if they are not in the graph
+    insertVertex(src, srcData);
+    insertVertex(dst, dstData);
+
+    insertEdge(src, dst, data);
 
     return true;
 
@@ -134,7 +150,7 @@ namespace KGMiner{
   }
 
   template<class VD, class ED>
-  string TypedDirectedGraph<VD, ED>::str() {
+  string TypedDirectedGraph<VD, ED>::str() const {
     ostringstream oss;
     for(auto src : directedGraph) {
       for(auto dst : src.second) {
@@ -295,5 +311,6 @@ namespace KGMiner{
 
   /* instantations decleared here */
   template class TypedDirectedGraph<int, int>;
+
 }
 

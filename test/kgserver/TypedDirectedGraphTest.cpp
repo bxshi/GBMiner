@@ -144,3 +144,20 @@ TEST(TypedDirectedGraphTest, pathsBetweenTwoNodes) {
   paths = graph.getPathsBetween(1,6,3, vertexMask, edgeMask);
   EXPECT_EQ(paths.size(), 0);
 }
+
+TEST(TypedDirectedGraphTest, printGraph) {
+  using namespace KGMiner;
+  TypedDirectedGraph<int, int> graph;
+
+  vector<unsigned int> vids = {1,2,3};
+  vector<int> vdata = {1,2,3};
+
+  EXPECT_EQ(graph.insertVertices(vids, vdata), true);
+  EXPECT_EQ(graph.getProperties().getVertices(), 3);
+
+  EXPECT_EQ(graph.insertEdge(1, 2, 12), true);
+  EXPECT_EQ(graph.insertEdge(1, 3, 13), true);
+  EXPECT_EQ(graph.insertEdge(3, 1, 31), true);
+
+  EXPECT_EQ(graph.str(), "3-(31)->1\n1-(12)->2\n1-(13)->3\n");
+}

@@ -60,6 +60,18 @@ namespace KGMiner {
                               unsigned int dst, VD dstData,
                               ED data, bool insert = false) = 0;
 
+
+      /*! \brief Insert an edge with existing vertices
+       *
+       * \param src source vertex
+       * \param dst destination vertex
+       * \param data of input edge
+       *
+       * \return true if `src` and `dst` exists and such edge can be added.
+       */
+      virtual bool insertEdge(unsigned int src, unsigned int dst,
+                              ED data) = 0;
+
       /*!
        *
        */
