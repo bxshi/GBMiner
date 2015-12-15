@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include <TypedDirectedGraph.h>
-#include <Path.h>
 
 TEST(TypedDirectedGraphTest, construction) {
   using namespace KGMiner;
@@ -143,6 +142,7 @@ TEST(TypedDirectedGraphTest, pathsBetweenTwoNodes) {
   edgeMask.insert(1);
   paths = graph.getPathsBetween(1,6,3, vertexMask, edgeMask);
   EXPECT_EQ(paths.size(), 0);
+
 }
 
 TEST(TypedDirectedGraphTest, printGraph) {

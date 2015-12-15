@@ -162,6 +162,21 @@ namespace KGMiner{
     return oss.str();
   }
 
+  /*! \brief Helper function to check if id is in maskSet.
+   *
+   */
+  inline bool masked(const unordered_set<unsigned int> &maskSet, unsigned int id) {
+    return maskSet.find(id) != maskSet.end();
+  }
+
+  inline string print(const vector<unsigned int> &vec) {
+    ostringstream oss;
+    for (auto id : vec) {
+      oss << id << " ";
+    }
+    return oss.str();
+  }
+
 
   template<class VD, class ED>
   vector<deque<unsigned int>> TypedDirectedGraph<VD, ED>::cartesianProduct(
@@ -196,46 +211,53 @@ namespace KGMiner{
 
 
     vector<unsigned int> vertexPath = {src};
+    unordered_set<unsigned int> visitedSet = {src}; //TODO: optimize this
 
+    /*! DFS traverse helper function */
     function<void()> helper = [&]() {
 
-      if (vertexPath.size() > maxLength + 1) return;
+      if (vertexPath.size() > maxLength + 1) return; /*< terminate if exceeds the length requirement */
 
-      if (vertexPath.back() == dst) {
+      if (vertexPath.back() == dst) { /* reaches the destination node */
+        // logger.debug(print(vertexPath)+"\n");
         auto expandedPaths = expandVertexPath(vertexPath, edgeMask);
         pathVec.insert(pathVec.end(), expandedPaths.begin(), expandedPaths.end());
         return;
       }
 
-      auto neighbors = directedGraph.find(vertexPath.back());
+      auto neighbors = directedGraph.find(vertexPath.back()); /*< find all out-going nodes */
 
       // visited set for current level
-      unordered_set<unsigned int> visitedSet;
+      unordered_set<unsigned int> levelSet; /*< make sure if we only visited a node once by either neighbors or rneighbors */
 
-      visitedSet.insert(vertexPath.begin(), vertexPath.end());
-
-      if (neighbors != directedGraph.end()) {
+      if (neighbors != directedGraph.end()) { /*< if have out-going nodes */
         for(auto neighbor : neighbors->second) {
           // not masked
-          if (vertexMask.find(neighbor.first) == vertexMask.end() && visitedSet.find(neighbor.first) == visitedSet.end()) {
+          if (!masked(vertexMask, neighbor.first) && !masked(visitedSet, neighbor.first) &&
+              !masked(levelSet, neighbor.first)) {
             vertexPath.push_back(neighbor.first);
+            visitedSet.insert(neighbor.first);
+            // logger.trace("try next node "+to_string(neighbor.first)+"\n");
             helper();
             vertexPath.pop_back();
-            visitedSet.insert(neighbor.first);
+            visitedSet.erase(neighbor.first);
+            levelSet.insert(neighbor.first);
           }
         }
       }
 
       neighbors = reversedGraph.find(vertexPath.back());
 
-      if (neighbors != reversedGraph.end()) {
+      if (neighbors != reversedGraph.end()) { /*< if have in-coming nodes */
         for(auto neighbor : neighbors->second) {
-          if (vertexMask.find(neighbor.first) == vertexMask.end() &&
-              visitedSet.find(neighbor.first) == visitedSet.end()) {
+          if (!masked(vertexMask, neighbor.first) && !masked(visitedSet, neighbor.first) &&
+              !masked(levelSet, neighbor.first)) {
             vertexPath.push_back(neighbor.first);
+            visitedSet.insert(neighbor.first);
             helper();
             vertexPath.pop_back();
-            visitedSet.insert(neighbor.first);
+            visitedSet.erase(neighbor.first);
+            levelSet.insert(neighbor.first);
           }
         }
       }
@@ -247,6 +269,15 @@ namespace KGMiner{
     return pathVec;
   }
 
+  /*! \brief convert entity path into meta path.
+   *
+   * \param vertexPath entity path
+   * \param edgeMask edge types we will discard
+   *
+   * Note this program returns a vector of Path objects, in which the edges are edgeId instead of edge type.
+   * Therefore 1-(2)->3 means node 1 connects to node 3 by edge 2, not by edge type 2. The type of that edge is edgeData[2]
+   *
+   */
   template<class VD, class ED>
   vector <Path> TypedDirectedGraph<VD, ED>::expandVertexPath(const vector<unsigned int> &vertexPath,
                                                                const unordered_set <ED> &edgeMask) const {
@@ -259,7 +290,7 @@ namespace KGMiner{
         // still have old paths
         while(paths.size() > 0 && paths.front().last() != vertex) {
           Path p = paths.front();
-          paths.pop_front();
+          paths.pop_front(); // TODO: optimize performance
 
           auto neighbors = directedGraph.find(vertex);
           auto rneighbors = reversedGraph.find(vertex);
