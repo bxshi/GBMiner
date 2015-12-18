@@ -9,6 +9,7 @@
 
 #include <string>
 #include <algorithm>
+#include <sstream>
 #include <boost/log/trivial.hpp>
 
 /*! \brief Wrapper of Boost's logging function
