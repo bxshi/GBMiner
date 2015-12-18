@@ -6,7 +6,9 @@
 
 #include <iostream>
 
-opts::opts() : desc("Allowed options") {
+namespace KGMiner {
+
+  opts::opts() : desc("Allowed options") {
 
     std::string port_desc = "Port number, default is " + std::to_string(port);
 
@@ -60,14 +62,15 @@ opts::opts() : desc("Allowed options") {
         int > ();
       }
       is_directed = vm.count("directed") == 1;
-    } catch (std::exception& err) {
+    } catch (std::exception &err) {
       std::cout << err.what() << std::endl;
       return false;
     }
-    catch(...) {
+    catch (...) {
       std::cout << "Unknown error" << std::endl;
       return false;
     }
 
     return true;
   }
+}
