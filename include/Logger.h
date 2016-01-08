@@ -10,7 +10,9 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
+#include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
 /*! \brief Wrapper of Boost's logging function
  *
@@ -62,12 +64,12 @@ namespace KGMiner {
 
   public:
 
-      Logger() : level(LOG_LEVEL_TRACE) {
-
+      Logger() : level(LOG_LEVEL_INFO) {
+        core::get()->set_filter(trivial::severity >= (trivial::severity_level) level);
       }
 
       Logger(LOG_LEVEL level) : level(level) {
-
+        core::get()->set_filter(trivial::severity >= (trivial::severity_level) level);
       }
 
       Logger(string strLevel) {
