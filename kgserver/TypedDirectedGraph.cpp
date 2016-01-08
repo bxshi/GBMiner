@@ -3,6 +3,7 @@
 //
 
 #include "TypedDirectedGraph.h"
+#include <fstream>
 
 namespace KGMiner{
 
@@ -338,6 +339,121 @@ namespace KGMiner{
     }
 
     return paths;
+  }
+
+  template<class VD, class ED>
+  void TypedDirectedGraph<VD, ED>::getNodeCluster(unordered_set<unsigned int> &srcCluster, unsigned int maxLength,
+                                                  const unordered_set<unsigned int> &vertexMask,
+                                                  const unordered_set<ED> &edgeMask) {
+    unordered_set<unsigned int> result;
+    result.reserve(srcCluster.size() * maxLength); // allocate space conservatively
+
+    deque<unsigned int> q;
+
+    // check if there is masked vertex in the src cluster
+    for (auto vertex : vertexMask) {
+      auto v = srcCluster.find(vertex);
+      if (v != srcCluster.end()) {
+        srcCluster.erase(v);
+      }
+    }
+
+    q.insert(q.end(), srcCluster.begin(), srcCluster.end());
+
+    while (maxLength > 0 && q.size() > 0) {
+      --maxLength;
+
+      size_t iterSize = q.size(); // how many nodes in this level
+
+      while (iterSize > 0 && q.size() > 0) {
+        --iterSize;
+        unsigned int vid = q.front();
+        q.pop_front();
+
+        auto nextFunc = [&](
+            unordered_map<unsigned int, unordered_map<unsigned int, vector<unsigned int>>>::iterator neighbors) {
+          if (neighbors != directedGraph.end()) {
+            for (auto neighbor : neighbors->second) {
+
+              // make sure neighbor->first has not been visited
+              if (srcCluster.find(neighbor.first) != srcCluster.end() ||
+                  vertexMask.find(neighbor.first) != vertexMask.end())
+                continue;
+
+              //TODO: to speed this up, we need to change the structure of TypedDirectedGraph to id : {id : {rel_type : count}}
+
+              for (auto edge : neighbor.second) {
+                if (edgeMask.find(eData[edge]) == edgeMask.end()) {
+                  // if connected by a non-masked edge type, add it into queue
+                  q.push_back(neighbor.first);
+                  srcCluster.insert(neighbor.first);
+                  break;
+                }
+              }
+            }
+          }
+        };
+
+        nextFunc(directedGraph.find(vid));
+        nextFunc(reversedGraph.find(vid));
+      }
+
+    }
+
+
+  }
+
+  template<class VD, class ED>
+  bool TypedDirectedGraph<VD, ED>::isConnected(unsigned int src, unsigned int dst,
+                                               const unordered_set<unsigned int> &vertexMask,
+                                               const unordered_set<ED> &edgeMask) {
+    return false;
+  }
+
+  template<class VD, class ED>
+  void TypedDirectedGraph<VD, ED>::load(const string &nodeFlie, const string &edgeFile, const string &edgeTypeFile) {
+
+    // read nodes
+    fstream fin(nodeFlie, fstream::in);
+    VD vd;
+    unsigned int id;
+
+    while (!fin.eof()) {
+      fin >> id;
+      fin.get();
+      fin >> vd;
+
+      insertVertex(id, vd);
+    }
+    fin.close();
+
+    fin = fstream(edgeTypeFile, fstream::in);
+    unsigned int edge;
+    ED ed;
+
+    unordered_map<int, ED> eMap;
+
+    while (!fin.eof()) {
+      fin >> edge;
+      fin.get();
+      fin >> ed;
+      eMap[edge] = ed;
+    }
+    fin.close();
+
+    fin = fstream(edgeFile, fstream::in);
+
+    unsigned int src, dst, eid;
+
+    while (!fin.eof()) {
+      fin >> src;
+      fin >> dst;
+      fin.get();
+      fin >> eid;
+
+      insertEdge(src, dst, eMap[eid]);
+    }
+    fin.close();
   }
 
   /* instantations decleared here */

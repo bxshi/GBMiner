@@ -91,8 +91,19 @@ namespace KGMiner {
                        vector<unsigned int> dstVec,
                        vector<ED> data);
 
+      void load(const string &nodeFlie, const string &edgeFile, const string &edgeTypeFile);
+
       vector<Path> getPathsBetween(unsigned int src, unsigned int dst, unsigned int maxLength,
-                                   const unordered_set<unsigned int> &vertexMask, const unordered_set<ED> &edgeMask);
+                                   const unordered_set<unsigned int> &vertexMask,
+                                   const unordered_set<ED> &edgeMask);
+
+      bool isConnected(unsigned int src, unsigned int dst,
+                       const unordered_set<unsigned int> &vertexMask,
+                       const unordered_set<ED> &edgeMask);
+
+      void getNodeCluster(unordered_set<unsigned int> &srcCluster, unsigned int maxLength,
+                          const unordered_set<unsigned int> &vertexMask,
+                          const unordered_set<ED> &edgeMask);
 
       string str() const;
 

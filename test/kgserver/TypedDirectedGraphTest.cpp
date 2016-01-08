@@ -161,3 +161,59 @@ TEST(TypedDirectedGraphTest, printGraph) {
 
   EXPECT_EQ(graph.str(), "3-(31)->1\n1-(12)->2\n1-(13)->3\n");
 }
+
+
+TEST(TypeDirectedGraphTest, nodeCluster) {
+  using namespace KGMiner;
+
+  TypedDirectedGraph<int, int> graph;
+  vector<unsigned int> vids = {1, 2, 3, 4, 5, 6};
+  vector<int> vdata = {1, 2, 3, 4, 5, 6};
+
+  EXPECT_EQ(graph.insertVertices(vids, vdata), true);
+  EXPECT_EQ(graph.getProperties().getVertices(), 6);
+
+  EXPECT_EQ(graph.insertEdge(1, 2, 1), true);
+  EXPECT_EQ(graph.insertEdge(1, 3, 1), true);
+  EXPECT_EQ(graph.insertEdge(4, 2, 1), true);
+  EXPECT_EQ(graph.insertEdge(1, 5, 1), true);
+  EXPECT_EQ(graph.insertEdge(6, 5, 1), true);
+
+  unordered_set<unsigned int> cluster;
+  cluster.insert(1);
+
+  unordered_set<unsigned int> nodeMask;
+  unordered_set<int> edgeMask;
+
+  graph.getNodeCluster(cluster, 1, nodeMask, edgeMask);
+
+  EXPECT_EQ(cluster.size(), 4);
+  EXPECT_NE(cluster.find(1), cluster.end());
+  EXPECT_NE(cluster.find(2), cluster.end());
+  EXPECT_NE(cluster.find(3), cluster.end());
+  EXPECT_NE(cluster.find(5), cluster.end());
+
+
+  cluster.clear();
+  cluster.insert(1);
+
+  nodeMask.insert(5);
+
+  graph.getNodeCluster(cluster, 2, nodeMask, edgeMask);
+
+  EXPECT_EQ(cluster.size(), 4);
+  EXPECT_NE(cluster.find(1), cluster.end());
+  EXPECT_NE(cluster.find(2), cluster.end());
+  EXPECT_NE(cluster.find(3), cluster.end());
+  EXPECT_NE(cluster.find(4), cluster.end());
+  EXPECT_EQ(cluster.find(5), cluster.end());
+
+  cluster.clear();
+  cluster.insert(1);
+
+  edgeMask.insert(1);
+
+  graph.getNodeCluster(cluster, 5, nodeMask, edgeMask);
+  EXPECT_EQ(cluster.size(), 1);
+
+}

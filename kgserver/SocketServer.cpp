@@ -39,6 +39,7 @@ namespace KGMiner {
     local::stream_protocol::acceptor acceptor(socket_io_service, ep);
 
     while (isAlive) {
+      //TODO: If worker is in workerFunc and waiting for an incoming connection, then this will not exit until it gets one.
       local::stream_protocol::socket *socket = new local::stream_protocol::socket(socket_io_service);
       acceptor.accept(*socket);
       worker_io_service.post(boost::bind(workerFunc, socket, g));

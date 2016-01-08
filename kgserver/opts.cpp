@@ -12,6 +12,7 @@ namespace KGMiner {
 
     std::string port_desc = "Port number, default is " + std::to_string(port);
 
+    //TODO: add an option for log level
     desc.add_options()
         ("help,h", "display help message")
         ("edge,e", boost::program_options::value<std::string>()->required(),

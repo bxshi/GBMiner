@@ -28,6 +28,7 @@ int main(int argc, const char *argv[]) {
 
   /* Load graph */
   KGMiner::TypedDirectedGraph<string, string> graph;
+  graph.load(options.getNode_filepath(), options.getEdge_filepath(), options.getType_filepath());
 
 
   /* Start server */

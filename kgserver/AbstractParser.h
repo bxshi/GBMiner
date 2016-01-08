@@ -30,6 +30,7 @@ namespace KGMiner {
           CONNECTED, // if two entities are connected
           IN_NEIGHBOR, // all nodes that connect to the given query node
           OUT_NEIGHBOR, // all nodes that query node can reach in one hop
+          NODE_CLUSTER, // all nodes within given length
 
           // information network related
 

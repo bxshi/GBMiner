@@ -14,12 +14,12 @@ namespace KGMiner {
     doc.Parse(jsonStr.c_str());
     if (doc.HasParseError()) {
       logger.warn("Can not parse json string " + jsonStr);
-      logger.warn(to_string(doc.GetParseError()));
     }
     return doc;
   }
 
   AbstractParser::COMMAND_TYPE jsonParser::command(const rapidjson::Document &d) const {
+    if (d.HasParseError()) return UNDEFINED;
     if (!d.HasMember("cmd")) return UNDEFINED;
 
     string cmd = d["cmd"].GetString();
@@ -33,6 +33,7 @@ namespace KGMiner {
     if (cmd.compare("connected") == 0) return CONNECTED;
     if (cmd.compare("in_neighbor") == 0) return IN_NEIGHBOR;
     if (cmd.compare("out_neighbor") == 0) return OUT_NEIGHBOR;
+    if (cmd.compare("node_cluster") == 0) return NODE_CLUSTER;
     if (cmd.compare("ontology") == 0) return ONTOLOGY;
     if (cmd.compare("siblings") == 0) return SIBLINGS;
     if (cmd.compare("path") == 0) return PATH;
