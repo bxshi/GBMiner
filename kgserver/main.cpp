@@ -3,7 +3,7 @@
 //
 
 #include "SocketServer.h"
-#include "opts.h"
+#include "Opts.h"
 
 using namespace std;
 
@@ -20,7 +20,7 @@ int main(int argc, const char *argv[]) {
   KGMiner::Logger logger;
   logger.setPrefix("[Main]\t");
 
-  KGMiner::opts options;
+  KGMiner::Opts options;
   if (!options.parse(argc, argv)) {
     logger.error("Parameter parsing error, exit.");
     return -1;

@@ -29,6 +29,8 @@ namespace KGMiner {
 
       bool write(local::stream_protocol::socket *socket, string str) const;
 
+      bool write(local::stream_protocol::socket *socket, const char *str) const;
+
       rapidjson::Document read(local::stream_protocol::socket *socket) const;
 
   };

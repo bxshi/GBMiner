@@ -8,10 +8,10 @@
 #include <boost/program_options.hpp>
 
 namespace KGMiner {
-  class opts {
+  class Opts {
+  private:
       boost::program_options::options_description desc;
 
-  private:
       std::string node_filepath;
       std::string edge_filepath;
       std::string type_filepath;
@@ -21,11 +21,10 @@ namespace KGMiner {
       unsigned int rel_type = 671;
 
   public:
-      opts();
+      Opts();
 
       bool parse(int argc, const char *argv[]);
 
-  public:
 
       const unsigned int &getRel_type() const {
         return rel_type;

@@ -17,7 +17,7 @@ set(SOURCE_FILES GraphProperty.cpp GraphProperty.h
         AbstractParser.h
         jsonParser.cpp jsonParser.h
         SocketServer.cpp SocketServer.h
-        opts.cpp opts.h
+        Opts.cpp Opts.h
         Worker.cpp Worker.h)
 
 add_executable(kgserver main.cpp ${SOURCE_FILES})

@@ -8,11 +8,13 @@ namespace KGMiner {
   using namespace std;
 
   rapidjson::Document jsonParser::parse(std::string jsonStr) const {
+    logger.debug("string to parse = " + jsonStr);
+    logger.debug("length is " + to_string(jsonStr.length()));
     Document doc;
     doc.Parse(jsonStr.c_str());
     if (doc.HasParseError()) {
       logger.warn("Can not parse json string " + jsonStr);
-      doc.Clear();
+      logger.warn(to_string(doc.GetParseError()));
     }
     return doc;
   }

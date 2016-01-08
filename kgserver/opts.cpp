@@ -2,13 +2,13 @@
 // Created by Baoxu Shi on 6/11/15.
 //
 
-#include "opts.h"
+#include "Opts.h"
 
 #include <iostream>
 
 namespace KGMiner {
 
-  opts::opts() : desc("Allowed options") {
+  Opts::Opts() : desc("Allowed options") {
 
     std::string port_desc = "Port number, default is " + std::to_string(port);
 
@@ -28,11 +28,11 @@ namespace KGMiner {
          "ontology relation type, the default value is 671");
   }
 
-  bool opts::parse(int argc, const char *argv[]) {
+  bool Opts::parse(int argc, const char *argv[]) {
     try {
       boost::program_options::variables_map vm;
       boost::program_options::store(boost::program_options::command_line_parser(argc, argv)
-                                        .options(opts::desc).run(), vm);
+                                        .options(Opts::desc).run(), vm);
 
       if (vm.count("help")) {
         desc.print(std::cout);
