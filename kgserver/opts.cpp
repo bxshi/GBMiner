@@ -5,6 +5,7 @@
 #include "Opts.h"
 
 #include <iostream>
+#include <Logger.h>
 
 namespace KGMiner {
 
@@ -26,7 +27,8 @@ namespace KGMiner {
          port_desc.c_str())
         ("worker,w", boost::program_options::value<int>(), "Number of workers, default is 10")
         ("ontology,o", boost::program_options::value<unsigned int>(),
-         "ontology relation type, the default value is 671");
+         "ontology relation type, the default value is 671")
+        ("log,l", boost::program_options::value<std::string>(), "Log level, trace|debug|info|warn|error|fatal, default is info");
   }
 
   bool Opts::parse(int argc, const char *argv[]) {
@@ -59,10 +61,15 @@ namespace KGMiner {
         nworker = vm["worker"].as<int>();
       }
       if (vm.count("ontology")) {
-        rel_type = vm["ontology"].as < unsigned
-        int > ();
+        rel_type = vm["ontology"].as<unsigned int> ();
+      }
+      if (vm.count("log")) {
+        Logger::setFilter(Logger::getLevel(vm["log"].as<std::string>()));
+      } else {
+        Logger::setFilter(Logger::getLevel("info"));
       }
       is_directed = vm.count("directed") == 1;
+
     } catch (std::exception &err) {
       std::cout << err.what() << std::endl;
       return false;

@@ -20,6 +20,7 @@ namespace KGMiner {
       int nworker = 10;
       unsigned int rel_type = 671;
 
+
   public:
       Opts();
 
