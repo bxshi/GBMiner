@@ -22,6 +22,6 @@ set(SOURCE_FILES GraphProperty.cpp GraphProperty.h
 
 add_executable(kgserver main.cpp ${SOURCE_FILES})
 target_link_libraries(kgserver
-        gtest gtest_main
+        pthread
         ${Boost_LIBRARIES}
 )
