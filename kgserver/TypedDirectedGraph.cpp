@@ -414,46 +414,53 @@ namespace KGMiner{
   void TypedDirectedGraph<VD, ED>::load(const string &nodeFlie, const string &edgeFile, const string &edgeTypeFile) {
 
     // read nodes
-    fstream fin(nodeFlie, fstream::in);
-    VD vd;
-    unsigned int id;
+    {
+      fstream fin(nodeFlie, fstream::in);
+      VD vd;
+      unsigned int id;
 
-    while (!fin.eof()) {
-      fin >> id;
-      fin.get();
-      fin >> vd;
+      while (!fin.eof()) {
+        fin >> id;
+        fin.get();
+        fin >> vd;
 
-      insertVertex(id, vd);
+        insertVertex(id, vd);
+      }
+      fin.close();
     }
-    fin.close();
-
-    fin = fstream(edgeTypeFile, fstream::in);
-    unsigned int edge;
-    ED ed;
 
     unordered_map<int, ED> eMap;
 
-    while (!fin.eof()) {
-      fin >> edge;
-      fin.get();
-      fin >> ed;
-      eMap[edge] = ed;
+    {
+      fstream fin(edgeTypeFile, fstream::in);
+      unsigned int edge;
+      ED ed;
+
+
+      while (!fin.eof()) {
+        fin >> edge;
+        fin.get();
+        fin >> ed;
+        eMap[edge] = ed;
+      }
+      fin.close();
     }
-    fin.close();
 
-    fin = fstream(edgeFile, fstream::in);
+    {
+      fstream fin(edgeFile, fstream::in);
 
-    unsigned int src, dst, eid;
+      unsigned int src, dst, eid;
 
-    while (!fin.eof()) {
-      fin >> src;
-      fin >> dst;
-      fin.get();
-      fin >> eid;
+      while (!fin.eof()) {
+        fin >> src;
+        fin >> dst;
+        fin.get();
+        fin >> eid;
 
-      insertEdge(src, dst, eMap[eid]);
+        insertEdge(src, dst, eMap[eid]);
+      }
+      fin.close();
     }
-    fin.close();
   }
 
   /* instantations decleared here */
