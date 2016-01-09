@@ -48,16 +48,19 @@ int main(int argc, const char *argv[]) {
 
   logger.trace("command sent");
 
-  char buf[81920];
+  char buf[819200];
   boost::system::error_code error;
   size_t len = 0;
 
   while (1) {
-    len += my_socket.read_some(boost::asio::buffer(buf + len, 81920 - len));
+    len += my_socket.read_some(boost::asio::buffer(buf + len, 819200 - len));
     if (buf[len] == '\0') {
       break;
     }
-    if (len >= 81920) break;
+    if (len >= 819200) {
+      logger.fatal("data exceed 819200 bytes!");
+      break;
+    }
   }
 
   //std::cout << "read " << len << " bytes\n";
