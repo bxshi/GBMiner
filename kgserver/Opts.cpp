@@ -13,7 +13,6 @@ namespace KGMiner {
 
     std::string port_desc = "Port number, default is " + std::to_string(port);
 
-    //TODO: add an option for log level
     desc.add_options()
         ("help,h", "display help message")
         ("edge,e", boost::program_options::value<std::string>()->required(),
@@ -28,7 +27,8 @@ namespace KGMiner {
         ("worker,w", boost::program_options::value<int>(), "Number of workers, default is 10")
         ("ontology,o", boost::program_options::value<unsigned int>(),
          "ontology relation type, the default value is 671")
-        ("log,l", boost::program_options::value<std::string>(), "Log level, trace|debug|info|warn|error|fatal, default is info");
+        ("log,l", boost::program_options::value<std::string>(), "Log level, trace|debug|info|warn|error|fatal, default is info")
+        ("format,f", boost::program_options::value<std::string>(), "Return format, pretty|dense, default is pretty");
   }
 
   bool Opts::parse(int argc, const char *argv[]) {
@@ -67,6 +67,15 @@ namespace KGMiner {
         Logger::setFilter(Logger::getLevel(vm["log"].as<std::string>()));
       } else {
         Logger::setFilter(Logger::getLevel("info"));
+      }
+      if (vm.count("format")) {
+        if (vm["format"].as<std::string>() == "dense" || vm["format"].as<std::string>() == "pretty") {
+          json_format = vm["format"].as<std::string>();
+        } else {
+          json_format = "pretty";
+        }
+      } else {
+        json_format = "pretty";
       }
       is_directed = vm.count("directed") == 1;
 

@@ -15,6 +15,7 @@ namespace KGMiner {
       std::string node_filepath;
       std::string edge_filepath;
       std::string type_filepath;
+      std::string json_format;
       int port = 8964;
       bool is_directed;
       int nworker = 10;
@@ -41,6 +42,10 @@ namespace KGMiner {
 
       const std::string &getType_filepath() const {
         return type_filepath;
+      }
+
+      const std::string &getJson_format() const {
+        return json_format;
       }
 
       int getPort() const {

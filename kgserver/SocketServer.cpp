@@ -30,7 +30,7 @@ namespace KGMiner {
     threadpool.join_all();
   }
 
-  void SocketServer::start(string socketName, TypedDirectedGraph<string, string> *g) {
+  void SocketServer::start(string socketName, TypedDirectedGraph<string, string> *g, string const writerType) {
     boost::asio::io_service socket_io_service;
 
     ::unlink(socketName.c_str());
@@ -42,7 +42,7 @@ namespace KGMiner {
       //TODO: If worker is in workerFunc and waiting for an incoming connection, then this will not exit until it gets one.
       local::stream_protocol::socket *socket = new local::stream_protocol::socket(socket_io_service);
       acceptor.accept(*socket);
-      worker_io_service.post(boost::bind(workerFunc, socket, g));
+      worker_io_service.post(boost::bind(workerFunc, socket, g, writerType));
     }
 
     logger.info("Stopping server now...");

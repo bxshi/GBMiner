@@ -38,7 +38,7 @@ int main(int argc, const char *argv[]) {
   signal(SIGTERM, signalHandler);
   signal(SIGINT, signalHandler);
 
-  ss->start("/tmp/kgminer", &graph);
+  ss->start("/tmp/kgminer", &graph, options.getJson_format());
 
 
   return 0;

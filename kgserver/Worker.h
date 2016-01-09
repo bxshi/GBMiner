@@ -19,7 +19,7 @@
 namespace KGMiner {
   namespace local = boost::asio::local;
 
-  void workerFunc(local::stream_protocol::socket *socket, TypedDirectedGraph<string, string> *g);
+  void workerFunc(local::stream_protocol::socket *socket, TypedDirectedGraph<string, string> *g, string const writerType);
 
   class Worker {
   public:

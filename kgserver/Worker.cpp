@@ -62,25 +62,31 @@ namespace KGMiner {
   /**
    * Main handler of incoming requests.
    */
-  void workerFunc(local::stream_protocol::socket *socket, TypedDirectedGraph<string, string> *g) {
+  void workerFunc(local::stream_protocol::socket *socket, TypedDirectedGraph<string, string> *g, string const writerType) {
 
     try {
       Worker w;
 
-      Document doc = w.read(socket);
+      Document doc = w.read(socket); //< read input command from socket
 
-      rapidjson::StringBuffer stringBuffer;
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> prettyWriter(stringBuffer);
+
+      // json writers
+      rapidjson::StringBuffer prettyBuffer;
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> prettyWriter(prettyBuffer);
       prettyWriter.SetIndent(' ', 2);
-      prettyWriter.StartObject();
+
+      rapidjson::StringBuffer denseBuffer;
+      rapidjson::Writer<rapidjson::StringBuffer> denseWriter(denseBuffer);
+
+
+      Document returnJson;
+      returnJson.SetObject();
 
       switch (w.jParser.command(doc)) {
         case AbstractParser::STATS:
 
           //TODO: change this to return real status of the server
-          prettyWriter.Key("status");
-          prettyWriter.String("OK");
-
+          returnJson.AddMember("status", "ok", returnJson.GetAllocator());
           break;
         case AbstractParser::GRAPH:
           //TODO: return graph properties, e.g. number of edges, number of vertices, ontology types, etc,.
@@ -98,18 +104,17 @@ namespace KGMiner {
         case AbstractParser::NODE_CLUSTER: {
           //TODO: return nodes within a certain radius
 
-          prettyWriter.Key("status");
           if (!doc.HasMember("node") || !(doc["node"].IsUint() || doc["node"].IsArray())) {
-            prettyWriter.String("Do not have valid source node(s)");
+            returnJson.AddMember("status", "Do not have valid source node(s)", returnJson.GetAllocator());
             break;
           }
 
           if (!doc.HasMember("length") || !doc["length"].IsUint()) {
-            prettyWriter.String("Do not have valid cluster radius");
+            returnJson.AddMember("status", "Do not have valid cluster radius", returnJson.GetAllocator());
             break;
           }
 
-          prettyWriter.String("OK"); // all required fields are met
+          returnJson.AddMember("status", "ok", returnJson.GetAllocator());
 
           unordered_set<unsigned int> cluster;
           if (doc["node"].IsArray()) {
@@ -150,12 +155,13 @@ namespace KGMiner {
 
           g->getNodeCluster(cluster, doc["length"].GetUint(), vertexMask, edgeMask);
 
-          prettyWriter.Key("cluster");
-          prettyWriter.StartArray();
+          Document clusterArray;
+          clusterArray.SetArray();
           for (auto id : cluster) {
-            prettyWriter.Uint(id);
+            clusterArray.PushBack(id, clusterArray.GetAllocator());
           }
-          prettyWriter.EndArray();
+
+          returnJson.AddMember("cluster", clusterArray, returnJson.GetAllocator());
 
           break;
         }
@@ -179,12 +185,18 @@ namespace KGMiner {
         case AbstractParser::KATZ:
           break;
         case AbstractParser::UNDEFINED:
-          prettyWriter.Key("status");
-          prettyWriter.String("unsupported operator");
+          returnJson.AddMember("status", "unsupported operator", returnJson.GetAllocator());
       }
 
-      prettyWriter.EndObject();
-      w.write(socket, stringBuffer.GetString());
+
+      // stringify JSON and return
+      if (writerType.compare("pretty") == 0) {
+        returnJson.Accept(prettyWriter);
+        w.write(socket, prettyBuffer.GetString());
+      } else {
+        returnJson.Accept(denseWriter);
+        w.write(socket, denseBuffer.GetString());
+      }
 
     } catch (std::exception &exception) {
       std::cerr << exception.what() << std::endl;

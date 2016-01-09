@@ -42,7 +42,7 @@ namespace KGMiner {
 
       SocketServer(int nworker);
 
-      void start(string socketName, TypedDirectedGraph<string, string> *g);
+      void start(string socketName, TypedDirectedGraph<string, string> *g, string const writerType);
 
       void tryStop();
 
