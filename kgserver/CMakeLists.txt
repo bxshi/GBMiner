@@ -21,7 +21,4 @@ set(SOURCE_FILES GraphProperty.cpp GraphProperty.h
         Worker.cpp Worker.h)
 
 add_executable(kgserver main.cpp ${SOURCE_FILES})
-target_link_libraries(kgserver
-        pthread
-        ${Boost_LIBRARIES}
-)
+target_link_libraries(kgserver ${Boost_LIBRARIES})
