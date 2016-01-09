@@ -105,6 +105,26 @@ namespace KGMiner {
         case AbstractParser::NODE_CLUSTER: {
           //TODO: return nodes within a certain radius
 
+          /**
+           * Input format:
+           * {
+           *  node : an unsigned integer or an array of unsigned integers,
+           *  length : an unsigned integer,
+           *  [vMask : an unsigned integer or an array of unsigned integers],
+           *  [eMask : a string or an array of strings]
+           * }
+           *
+           * node are the starting nodes
+           * length is the max radius
+           * vMask is the vertex mask set (optional)
+           * eMask is the edge type mask set (optional)
+           *
+           * Example:
+           * { node : 1, vMask : [2,5], eMask : ["capital", "locate"], length : 3}
+           * get all nodes that can be reached from node `1` within 3 hops, ignore nodes 2 and 5, and edges with type "capital" or "locate"
+           *
+           */
+
           if (!doc.HasMember("node") || !(doc["node"].IsUint() || doc["node"].IsArray())) {
             returnJson.AddMember("status", "Do not have valid source node(s)", returnJson.GetAllocator());
             break;
