@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <deque>
-#include <Vector>
+#include <vector>
 
 #include "AbstractTypedGraph.h"
 #include "GraphProperty.h"
