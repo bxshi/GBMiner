@@ -36,11 +36,27 @@ namespace KGMiner {
 
       LOG_LEVEL level;
 
+
+
+      string prefix;
+
+  public:
+
+      Logger() : level(LOG_LEVEL_INFO) {
+      }
+
+      Logger(LOG_LEVEL level) : level(level) {
+      }
+
+      Logger(string strLevel) {
+        level = getLevel(strLevel);
+      }
+
       /*! Get level enum by string
        *
        * \param strLevel string of log level, can be "trace", "debug", "info", "warn", "error", and "fatal"
        */
-      inline LOG_LEVEL getLevel(string strLevel) const {
+      static inline LOG_LEVEL getLevel(string strLevel) {
 
         transform(strLevel.begin(), strLevel.end(), strLevel.begin(), ::tolower);
 
@@ -54,26 +70,12 @@ namespace KGMiner {
           return LOG_LEVEL_WARN;
         } else if (strLevel == "error") {
           return LOG_LEVEL_ERROR;
-        } else {
+        } else if (strLevel == "fatal") {
           return LOG_LEVEL_FATAL;
+        } else {
+          return LOG_LEVEL_INFO;
         }
 
-      }
-
-      string prefix;
-
-  public:
-
-      Logger() : level(LOG_LEVEL_INFO) {
-        core::get()->set_filter(trivial::severity >= (trivial::severity_level) level);
-      }
-
-      Logger(LOG_LEVEL level) : level(level) {
-        core::get()->set_filter(trivial::severity >= (trivial::severity_level) level);
-      }
-
-      Logger(string strLevel) {
-        level = getLevel(strLevel);
       }
 
       inline void setPrefix(string str) {
@@ -170,6 +172,10 @@ namespace KGMiner {
           default:
             return "unknown";
         }
+      }
+
+      static void setFilter(LOG_LEVEL level) {
+        core::get()->set_filter(trivial::severity >= (trivial::severity_level) level);
       }
 
   };
