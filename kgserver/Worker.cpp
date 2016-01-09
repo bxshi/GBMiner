@@ -155,10 +155,9 @@ namespace KGMiner {
 
           g->getNodeCluster(cluster, doc["length"].GetUint(), vertexMask, edgeMask);
 
-          Document clusterArray;
-          clusterArray.SetArray();
+          rapidjson::Value clusterArray(rapidjson::kArrayType);
           for (auto id : cluster) {
-            clusterArray.PushBack(id, clusterArray.GetAllocator());
+            clusterArray.PushBack(id, returnJson.GetAllocator());
           }
 
           returnJson.AddMember("cluster", clusterArray, returnJson.GetAllocator());
