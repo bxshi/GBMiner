@@ -345,9 +345,6 @@ namespace KGMiner{
   void TypedDirectedGraph<VD, ED>::getNodeCluster(unordered_set<unsigned int> &srcCluster, unsigned int maxLength,
                                                   const unordered_set<unsigned int> &vertexMask,
                                                   const unordered_set<ED> &edgeMask) {
-    unordered_set<unsigned int> result;
-    result.reserve(srcCluster.size() * maxLength); // allocate space conservatively
-
     deque<unsigned int> q;
 
     // check if there is masked vertex in the src cluster
@@ -361,9 +358,11 @@ namespace KGMiner{
     q.insert(q.end(), srcCluster.begin(), srcCluster.end());
 
     while (maxLength > 0 && q.size() > 0) {
+      logger.trace("node cluster iteration remains: " + to_string(maxLength));
       --maxLength;
 
       size_t iterSize = q.size(); // how many nodes in this level
+      logger.trace("nodes in this level: " + to_string(iterSize));
 
       while (iterSize > 0 && q.size() > 0) {
         --iterSize;
