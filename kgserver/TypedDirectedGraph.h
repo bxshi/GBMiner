@@ -101,6 +101,13 @@ namespace KGMiner {
                        const unordered_set<unsigned int> &vertexMask,
                        const unordered_set<ED> &edgeMask);
 
+      /**
+       * Get a set of nodes with in given radius
+       * \param srcCluster starting nodes, result will be written into this set
+       * \param maxLength max radius
+       * \param vertexMask vertices that will be skipped
+       * \param edgeMask edge types that will be skipped
+       */
       void getNodeCluster(unordered_set<unsigned int> &srcCluster, unsigned int maxLength,
                           const unordered_set<unsigned int> &vertexMask,
                           const unordered_set<ED> &edgeMask);
