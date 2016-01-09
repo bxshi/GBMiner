@@ -13,6 +13,7 @@ namespace KGMiner {
 
   bool Worker::write(local::stream_protocol::socket *socket, const char *str) const {
     bool success = true;
+    logger.trace("try to write "+to_string(strlen(str))+" bytes to client");
     try {
       size_t len = boost::asio::write(*socket, boost::asio::buffer(str, strlen(str)), boost::asio::transfer_all());
       if (len != strlen(str)) {
@@ -20,7 +21,7 @@ namespace KGMiner {
             "write error, should write " + to_string(strlen(str)) + " bytes, actual " + to_string(len) + " bytes.");
         success = false;
       } else {
-        logger.info("write " + to_string(strlen(str)) + " bytes to client.");
+        logger.trace("write " + to_string(strlen(str)) + " bytes to client.");
         success = true;
       }
       socket->close();
