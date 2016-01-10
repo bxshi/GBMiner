@@ -6,7 +6,7 @@
 #include <rapidjson/prettywriter.h>
 #include "Worker.h"
 
-#define BUFFER_SIZE 8192000;
+#define BUFFER_SIZE 8192000
 
 namespace KGMiner {
   bool Worker::write(boost::asio::local::stream_protocol::socket *socket, std::string str) const {
