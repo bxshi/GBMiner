@@ -6,6 +6,8 @@
 #include <rapidjson/prettywriter.h>
 #include "Worker.h"
 
+static size_t BUFFER_SIZE = 8192000;
+
 namespace KGMiner {
   bool Worker::write(boost::asio::local::stream_protocol::socket *socket, std::string str) const {
     return write(socket, str.c_str());
@@ -35,7 +37,8 @@ namespace KGMiner {
   }
 
   rapidjson::Document Worker::read(local::stream_protocol::socket *socket) const {
-    char buf[2048] = {0};
+    //TODO: change to dynamic buffer
+    char buf[BUFFER_SIZE] = {0};
     boost::system::error_code error;
 
     rapidjson::Document doc;
@@ -43,13 +46,16 @@ namespace KGMiner {
     size_t len = 0;
     try {
       while (1) {
-        len += socket->read_some(boost::asio::buffer(buf + len, 2048 - len));
-        if (buf[len] == '\0') {
-          doc = jParser.parse(string(buf, buf + len));
+        len += socket->read_some(boost::asio::buffer(buf + len, BUFFER_SIZE - len));
+
+        if (len >= BUFFER_SIZE) {
+          logger.warn(" buffer size is smaller than input command, please enlarge buffer.");
+          doc.SetObject();
           break;
         }
-        if (len >= 2048) {
-          logger.warn(" buffer size is smaller than input command, please enlarge buffer.");
+
+        if (buf[len] == '\0') {
+          doc = jParser.parse(string(buf, buf + len));
           break;
         }
       }
