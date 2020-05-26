@@ -2,11 +2,14 @@
 // Created by Baoxu Shi on 6/11/15.
 //
 
-#include "opts.h"
+#include "Opts.h"
 
 #include <iostream>
+#include <Logger.h>
 
-opts::opts() : desc("Allowed options") {
+namespace KGMiner {
+
+  Opts::Opts() : desc("Allowed options") {
 
     std::string port_desc = "Port number, default is " + std::to_string(port);
 
@@ -23,14 +26,16 @@ opts::opts() : desc("Allowed options") {
          port_desc.c_str())
         ("worker,w", boost::program_options::value<int>(), "Number of workers, default is 10")
         ("ontology,o", boost::program_options::value<unsigned int>(),
-         "ontology relation type, the default value is 671");
+         "ontology relation type, the default value is 671")
+        ("log,l", boost::program_options::value<std::string>(), "Log level, trace|debug|info|warn|error|fatal, default is info")
+        ("format,f", boost::program_options::value<std::string>(), "Return format, pretty|dense, default is pretty");
   }
 
-  bool opts::parse(int argc, const char *argv[]) {
+  bool Opts::parse(int argc, const char *argv[]) {
     try {
       boost::program_options::variables_map vm;
       boost::program_options::store(boost::program_options::command_line_parser(argc, argv)
-                                        .options(opts::desc).run(), vm);
+                                        .options(Opts::desc).run(), vm);
 
       if (vm.count("help")) {
         desc.print(std::cout);
@@ -56,18 +61,33 @@ opts::opts() : desc("Allowed options") {
         nworker = vm["worker"].as<int>();
       }
       if (vm.count("ontology")) {
-        rel_type = vm["ontology"].as < unsigned
-        int > ();
+        rel_type = vm["ontology"].as<unsigned int> ();
+      }
+      if (vm.count("log")) {
+        Logger::setFilter(Logger::getLevel(vm["log"].as<std::string>()));
+      } else {
+        Logger::setFilter(Logger::getLevel("info"));
+      }
+      if (vm.count("format")) {
+        if (vm["format"].as<std::string>() == "dense" || vm["format"].as<std::string>() == "pretty") {
+          json_format = vm["format"].as<std::string>();
+        } else {
+          json_format = "pretty";
+        }
+      } else {
+        json_format = "pretty";
       }
       is_directed = vm.count("directed") == 1;
-    } catch (std::exception& err) {
+
+    } catch (std::exception &err) {
       std::cout << err.what() << std::endl;
       return false;
     }
-    catch(...) {
+    catch (...) {
       std::cout << "Unknown error" << std::endl;
       return false;
     }
 
     return true;
   }
+}
